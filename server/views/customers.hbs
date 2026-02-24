@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  {{> header}}
+  <title>Clients</title>
+</head>
+<body>
+  {{> menu}}
+
+  <main class="container">
+    <h1>Clients</h1>
+
+    <p>Informació actualitzada de la base de dades</p>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Pel·lícula</th>
+          <th>Lloguer</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {{#each customers}}
+          <tr>
+            <td>{{Nom_Client}}</td>
+            <td>{{Titol}}</td>
+            <td>{{Data_Lloguer}}</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </main>
+
+  {{> footer}}
+</body>
+</html>

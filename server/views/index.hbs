@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  {{> header}}
+  <link rel="stylesheet" href="index.css">
+  <title>DAM1M04-Exercici302-MySQL</title>
+</head>
+<body>
+  {{> menu}}
+
+  <main class="container">
+    <h1>DAM1M04-Exercici302 MySQL-Consultes a BBDD</h1>
+
+    <section class="cols-2">
+      <article class="card">
+        <h2>Pel·lícules</h2>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Títol</th>
+              <th>Any</th>
+              <th>Actors</th>
+            </tr>
+          </thead>
+
+      <tbody>
+        {{#each movies}}
+          <tr>
+            <td>{{Titol}}</td>
+            <td>{{Any}}</td>
+            <td>{{Actors}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+        <br>
+        <h2>Categories</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nom</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each categories}}
+              <tr>
+                <td>{{id}}</td>
+                <td>{{name}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+
+
+      </article>
+    </section>
+  </main>
+
+  {{> footer}}
+</body>
+</html>
