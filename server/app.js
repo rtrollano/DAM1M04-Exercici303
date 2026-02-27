@@ -25,7 +25,7 @@ if (!isProxmox) {
     host: '127.0.0.1',
     port: 3306,
     user: 'root',
-    password: 'mysqlocal',
+    password: 'abc1exit',
     database: 'sakila'
   });
 }
@@ -181,6 +181,169 @@ app.get('/customers', async (req, res) => {
     res.status(500).send('Error consultant la base de dades per Customers');
   }
 });
+//Hasta aquí es lo mismo que en la práctica anterior, la 302
+//A partir de aquí va lo nuevo para la 303
+
+app.get('/moviesAdd', async (req, res) => {
+  try {
+    
+    // Llegir l'arxiu .json amb dades comunes per a totes les pàgines
+    const commonData = JSON.parse(
+      fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8')
+    )
+
+    // Construir l'objecte de dades per a la plantilla
+    // com que tenim una llista amb un sol element, agafem directament el primer element (cursosJson[0])
+    const data = {
+      common: commonData
+    }
+
+    // Render a new template (recommended)
+    res.render('cursAdd', data)
+  } catch (err) {
+    console.error(err)
+    res.status(500).send('Error consultant la base de dades')
+  }
+})
+
+app.get('/moviesEdit', async (req, res) => {
+  try {
+    const cursId = parseInt(req.query.id, 10)
+
+    if (!Number.isInteger(cursId) || cursId <= 0) {
+      return res.status(400).send('Paràmetre id invàlid')
+    }
+
+    const moviesRows = await db.query(`
+      select f.title as Titol, 
+             f.film_id as Id, f.release_year as Any, 
+             group_concat(concat(a.first_name, ' ', a.last_name) separator ', ') as Actors
+      from film f
+      join film_actor fa on f.film_id = fa.film_id
+      join actor a on a.actor_id = fa.actor_id
+      WHERE f.id = ${cursId}
+      group by f.film_id, f.title, f.release_year
+      order by f.title
+      limit 1;
+    `)
+
+    if (!cursRows || cursRows.length === 0) {
+      return res.status(404).send('Pel·lícula no trobada')
+    }
+
+
+    const commonData = JSON.parse(
+      fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8')
+    )
+
+    res.render('cursEdit', {
+      movies: moviesJson,
+      common: commonData
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).send('Error consultant la base de dades')
+  }
+})
+
+app.post('/create', async (req, res) => {
+  try {
+
+    const table = req.body.table
+
+    if (table == "movies") {
+
+      const titol = req.body.title
+      const any = req.body.any
+
+      // Basic validation
+      if (!titol || !any) {
+        return res.status(400).send('Falten dades')
+      }
+
+      await db.query(
+        `
+        INSERT INTO movies (titol, any)
+        VALUES ("${titol}", "${any}")
+        `
+      )
+
+      // Redirect to list of courses
+      res.redirect('/movies')
+    }
+
+  } catch (err) {
+    console.error(err)
+    res.status(500).send('Error afegint el curs')
+  }
+})
+
+app.post('/delete', async (req, res) => {
+  try {
+
+    const table = req.body.table
+
+    if (table == "movies") {
+
+      const id = parseInt(req.body.id, 10)
+
+      // Basic validation
+      if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).send('ID de pel·lícula invàlid')
+      }
+
+      await db.query(
+        `DELETE FROM movies WHERE id = ${id}`
+      )
+
+      res.redirect('/movies')
+    }
+
+  } catch (err) {
+    console.error(err)
+    res.status(500).send('Error esborrant la pel·lícula')
+  }
+})
+
+app.post('/update', async (req, res) => {
+  try {
+
+    const table = req.body.table
+
+    if (table == "cursos") {
+
+      const id = parseInt(req.body.id, 10)
+      const titol = req.body.titol
+      const any = req.body.any
+
+      // Basic validation
+      if (!Number.isInteger(id) || id <= 0) return res.status(400).send('ID invàlid')
+      if (!Number.isInteger(mestre_id) || mestre_id <= 0) return res.status(400).send('Mestre invàlid')
+      if (!titol || !any) return res.status(400).send('Falten dades')
+
+      // Update curs
+      await db.query(`
+        UPDATE cursos
+        SET titol = "${titol}", any = "${any}"
+        WHERE id = ${id};
+      `)
+
+      // Keep only 1 mestre per curs (UI)
+      await db.query(`DELETE FROM mestre_curs WHERE curs_id = ${id};`)
+      await db.query(`INSERT INTO mestre_curs (mestre_id, curs_id) VALUES (${mestre_id}, ${id});`)
+
+      res.redirect(`/curs?id=${id}`)
+    }
+  } catch (err) {
+    console.error(err)
+    res.status(500).send('Error editant el curs')
+  }
+})
+
+
+
+
+
 
 
 // Start server
