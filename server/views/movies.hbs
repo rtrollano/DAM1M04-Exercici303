@@ -10,6 +10,7 @@
   <main class="container">
     <h1>Pel·lícules</h1>
 
+
     <p>Informació actualitzada de la base de dades</p>
 
     <table class="table">
@@ -18,6 +19,7 @@
           <th>Títol</th>
           <th>Any</th>
           <th>Actors</th>
+          <th>Editar</th>
         </tr>
       </thead>
 
@@ -27,6 +29,7 @@
             <td>{{Titol}}</td>
             <td>{{Any}}</td>
             <td>{{Actors}}</td>
+            <td><a href="/moviesEdit?id={{movies.id}}">Editar</a></td>
           </tr>
         {{/each}}
       </tbody>

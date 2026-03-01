@@ -2,35 +2,30 @@
 <html lang="ca">
 <head>
   {{> header}}
-  <title>Pel·lícules</title>
+  <link rel="stylesheet" href="formularis.css">
+  <title>Afegir Pel·lícula</title>
 </head>
 <body>
   {{> menu}}
 
   <main class="container">
-    <h1>Pel·lícules</h1>
+    <h1>Afegir nova pel·lícula</h1>
 
-    <p>Informació actualitzada de la base de dades</p>
+    <form method="POST" action="/create" class="form-grid">
+      <input type="hidden" name="table" value="movies"/>
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Títol</th>
-          <th>Any</th>
-          <th>Actors</th>
-        </tr>
-      </thead>
+      <label for="Titol">Titol</label>
+      <input type="text" id="Titol" name="Titol" value="{{movies.Titol}}" required>
 
-      <tbody>
-        {{#each movies}}
-          <tr>
-            <td>{{Titol}}</td>
-            <td>{{Any}}</td>
-            <td>{{Actors}}</td>
-          </tr>
-        {{/each}}
-      </tbody>
-    </table>
+      <label for="Any">Any</label>
+      <input type="number" id="Any" name="Any" value="{{movies.Any}}" required>
+      
+      <label for="Any">Actors</label>
+      <input type="text" id="Actors" name="Actors" value="{{movies.Actors}}" required>
+
+
+      <button type="submit">Afegir pel·lícula</button>
+    </form>
   </main>
 
   {{> footer}}

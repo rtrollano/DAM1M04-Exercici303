@@ -95,7 +95,7 @@ app.get('/', async (req, res) => {
 
 app.get('/movies', async (req, res) => {
   try {
-
+ 
     // Obtenir les dades de la base de dades
     const moviesRows = await db.query(`select f.title as Titol, f.film_id as Id, f.release_year as Any, group_concat(concat(a.first_name, ' ', a.last_name) separator ', ') as Actors
                                         from film f
@@ -199,7 +199,7 @@ app.get('/moviesAdd', async (req, res) => {
     }
 
     // Render a new template (recommended)
-    res.render('cursAdd', data)
+    res.render('moviesAdd', data)
   } catch (err) {
     console.error(err)
     res.status(500).send('Error consultant la base de dades')
@@ -208,9 +208,9 @@ app.get('/moviesAdd', async (req, res) => {
 
 app.get('/moviesEdit', async (req, res) => {
   try {
-    const cursId = parseInt(req.query.id, 10)
+    const moviesId = parseInt(req.query.id, 10)
 
-    if (!Number.isInteger(cursId) || cursId <= 0) {
+    if (!Number.isInteger(moviesId) || moviesId <= 0) {
       return res.status(400).send('Paràmetre id invàlid')
     }
 
@@ -221,13 +221,13 @@ app.get('/moviesEdit', async (req, res) => {
       from film f
       join film_actor fa on f.film_id = fa.film_id
       join actor a on a.actor_id = fa.actor_id
-      WHERE f.id = ${cursId}
+      WHERE f.film_id = ${moviesId}
       group by f.film_id, f.title, f.release_year
       order by f.title
       limit 1;
     `)
 
-    if (!cursRows || cursRows.length === 0) {
+    if (!moviesRows || moviesRows.length === 0) {
       return res.status(404).send('Pel·lícula no trobada')
     }
 
@@ -236,7 +236,7 @@ app.get('/moviesEdit', async (req, res) => {
       fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8')
     )
 
-    res.render('cursEdit', {
+    res.render('moviesEdit', {
       movies: moviesJson,
       common: commonData
     })
@@ -274,7 +274,7 @@ app.post('/create', async (req, res) => {
 
   } catch (err) {
     console.error(err)
-    res.status(500).send('Error afegint el curs')
+    res.status(500).send('Error afegint el movies')
   }
 })
 
@@ -310,7 +310,7 @@ app.post('/update', async (req, res) => {
 
     const table = req.body.table
 
-    if (table == "cursos") {
+    if (table == "movies") {
 
       const id = parseInt(req.body.id, 10)
       const titol = req.body.titol
@@ -318,25 +318,22 @@ app.post('/update', async (req, res) => {
 
       // Basic validation
       if (!Number.isInteger(id) || id <= 0) return res.status(400).send('ID invàlid')
-      if (!Number.isInteger(mestre_id) || mestre_id <= 0) return res.status(400).send('Mestre invàlid')
       if (!titol || !any) return res.status(400).send('Falten dades')
 
-      // Update curs
+      // Update movies
       await db.query(`
-        UPDATE cursos
+        UPDATE film
         SET titol = "${titol}", any = "${any}"
         WHERE id = ${id};
       `)
 
-      // Keep only 1 mestre per curs (UI)
-      await db.query(`DELETE FROM mestre_curs WHERE curs_id = ${id};`)
-      await db.query(`INSERT INTO mestre_curs (mestre_id, curs_id) VALUES (${mestre_id}, ${id});`)
+      // Keep only 1 mestre per movies (UI)
 
-      res.redirect(`/curs?id=${id}`)
+      res.redirect(`/movies?id=${id}`)
     }
   } catch (err) {
     console.error(err)
-    res.status(500).send('Error editant el curs')
+    res.status(500).send('Error editant el movies')
   }
 })
 

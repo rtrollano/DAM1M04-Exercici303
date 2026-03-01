@@ -2,37 +2,42 @@
 <html lang="ca">
 <head>
   {{> header}}
-  <title>Pel·lícules</title>
+  <link rel="stylesheet" href="formularis.css">
+  <title>Editar Pel·lícula</title>
 </head>
 <body>
   {{> menu}}
 
   <main class="container">
-    <h1>Pel·lícules</h1>
+    <h1>Editar Pel·lícula (ID: {{curs.id}})</h1>
 
-    <p>Informació actualitzada de la base de dades</p>
+    <form method="POST" action="/update" class="form-grid">
+      <input type="hidden" name="table" value="movies">
+      <input type="hidden" name="id" value="{{movies.id}}">
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Títol</th>
-          <th>Any</th>
-          <th>Actors</th>
-          <th>Editar</th>
-        </tr>
-      </thead>
+      <label for="Titol">Titol</label>
+      <input type="text" id="Titol" name="Titol" value="{{movies.Titol}}" required>
 
-      <tbody>
-        {{#each movies}}
-          <tr>
-            <td>{{Titol}}</td>
-            <td>{{Any}}</td>
-            <td>{{Actors}}</td>
-            <td><a href="/movies?id={{id}}">Editar</a></td>
-          </tr>
-        {{/each}}
-      </tbody>
-    </table>
+      <label for="Any">Any</label>
+      <input type="number" id="Any" name="Any" value="{{movies.Any}}" required>
+      
+      <label for="Any">Actors</label>
+      <input type="text" id="Actors" name="Actors" value="{{movies.Actors}}" required>
+      
+
+      <button type="submit">Desar canvis</button>
+    </form>
+
+    <hr>
+
+    <form method="POST" action="/delete" onsubmit="return true;">
+      <input type="hidden" name="table" value="movies">
+      <input type="hidden" name="id" value="{{movies.id}}">
+      <button type="submit">🗑️ Esborrar pel·lícula</button>
+    </form>
+
+    <br>
+    <a href="/movies?id={{movies.id}}">Tornar a la fitxa</a>
   </main>
 
   {{> footer}}
