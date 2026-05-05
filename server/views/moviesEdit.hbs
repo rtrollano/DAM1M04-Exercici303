@@ -9,11 +9,11 @@
   {{> menu}}
 
   <main class="container">
-    <h1>Editar Pel·lícula (ID: {{curs.id}})</h1>
+    <h1>Editar Pel·lícula (ID: {{movies.Id}})</h1>
 
     <form method="POST" action="/update" class="form-grid">
       <input type="hidden" name="table" value="movies">
-      <input type="hidden" name="id" value="{{movies.id}}">
+      <input type="hidden" name="id" value="{{movies.Id}}">
 
       <label for="Titol">Titol</label>
       <input type="text" id="Titol" name="Titol" value="{{movies.Titol}}" required>
@@ -32,12 +32,12 @@
 
     <form method="POST" action="/delete" onsubmit="return true;">
       <input type="hidden" name="table" value="movies">
-      <input type="hidden" name="id" value="{{movies.id}}">
+      <input type="hidden" name="id" value="{{movies.Id}}">
       <button type="submit">🗑️ Esborrar pel·lícula</button>
     </form>
 
     <br>
-    <a href="/movies?id={{movies.id}}">Tornar a la fitxa</a>
+    <a href="/movies?id={{movies.Id}}">Tornar a la fitxa</a>
   </main>
 
   {{> footer}}

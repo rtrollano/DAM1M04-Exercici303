@@ -106,7 +106,7 @@ app.get('/movies', async (req, res) => {
                                         limit 15`);
 
     // Transformar les dades a JSON (per les plantilles .hbs)
-    const moviesJson = db.table_to_json(moviesRows, {Titol: 'string',id: 'number',any: 'number', Actors: 'string'});
+    const moviesJson = db.table_to_json(moviesRows, {Titol: 'string',Id: 'number',Any: 'number', Actors: 'string'});
 
     // Llegir l'arxiu .json amb dades comunes per a totes les pàgines
     const commonData = JSON.parse(
@@ -236,8 +236,14 @@ app.get('/moviesEdit', async (req, res) => {
       fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8')
     )
 
+    const moviesJson = db.table_to_json(moviesRows, {
+  Titol: 'string',
+  Id: 'number',
+  Any: 'number',
+  Actors: 'string'
+});
     res.render('moviesEdit', {
-      movies: moviesJson,
+      movies: moviesJson[0],
       common: commonData
     })
   } catch (err) {
@@ -285,16 +291,42 @@ app.post('/delete', async (req, res) => {
 
     if (table == "movies") {
 
+
+      console.log("BODY DELETE:", req.body)
+console.log("ID RAW:", req.body.id)
       const id = parseInt(req.body.id, 10)
 
       // Basic validation
       if (!Number.isInteger(id) || id <= 0) {
         return res.status(400).send('ID de pel·lícula invàlid')
       }
+      // 1. rentals
+      await db.query(`
+        DELETE r
+        FROM rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        WHERE i.film_id = ${id}
+      `)
 
-      await db.query(
-        `DELETE FROM movies WHERE id = ${id}`
-      )
+      // 2. inventory
+      await db.query(`
+        DELETE FROM inventory WHERE film_id = ${id}
+      `)
+
+      // 3. film_actor
+      await db.query(`
+        DELETE FROM film_actor WHERE film_id = ${id}
+      `)
+
+      // 4. film_category
+      await db.query(`
+        DELETE FROM film_category WHERE film_id = ${id}
+      `)
+
+      // 5. film
+      await db.query(`
+        DELETE FROM film WHERE film_id = ${id}
+      `)
 
       res.redirect('/movies')
     }
@@ -313,8 +345,8 @@ app.post('/update', async (req, res) => {
     if (table == "movies") {
 
       const id = parseInt(req.body.id, 10)
-      const titol = req.body.titol
-      const any = req.body.any
+      const titol = req.body.Titol
+      const any = req.body.Any
 
       // Basic validation
       if (!Number.isInteger(id) || id <= 0) return res.status(400).send('ID invàlid')
@@ -323,8 +355,8 @@ app.post('/update', async (req, res) => {
       // Update movies
       await db.query(`
         UPDATE film
-        SET titol = "${titol}", any = "${any}"
-        WHERE id = ${id};
+        SET title = "${titol}", release_year = "${any}"
+        WHERE film_id = ${id};
       `)
 
       // Keep only 1 mestre per movies (UI)
